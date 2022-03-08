@@ -16,4 +16,20 @@ public class Encherisseur {
         Pseudo = pseudo;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof Encherisseur)) {
+            return false;
+        }
+
+        Encherisseur e = (Encherisseur) o;
+
+        return this.Pseudo == e.getPseudo();
+
+    }
+
 }

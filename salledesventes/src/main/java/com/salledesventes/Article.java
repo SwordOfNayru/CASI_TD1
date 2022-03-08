@@ -6,9 +6,9 @@ public class Article {
 
     private String Nom;
 
-    private double Prix;
+    private float Prix;
 
-    public Article(int numero, String nom, double prix) {
+    public Article(int numero, String nom, float prix) {
         this.Numero = numero;
         this.Nom = nom;
         this.Prix = prix;
@@ -22,11 +22,11 @@ public class Article {
         return Nom;
     }
 
-    public double getPrix() {
+    public float getPrix() {
         return Prix;
     }
 
-    public void setPrix(double prix) {
+    public void setPrix(float prix) {
         Prix = prix;
     }
 
