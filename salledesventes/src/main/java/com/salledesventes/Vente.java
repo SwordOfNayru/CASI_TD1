@@ -2,6 +2,8 @@ package com.salledesventes;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.concurrent.SubmissionPublisher;
+import java.util.concurrent.Flow.Subscriber;
 
 public class Vente {
 
@@ -15,11 +17,16 @@ public class Vente {
 
     private ArrayList<Enchere> ListEchere;
 
+    private SubmissionPublisher<Notification> submissionFlux;
+
     private boolean started = false;
 
     private Vente() {
         Encherisseurs = new HashSet<Encherisseur>();
         ListEchere = new ArrayList<Enchere>();
+        submissionFlux = new SubmissionPublisher<Notification>();
+
+        this.ListEchere.add(new Enchere(new Encherisseur("personne"), 0f));
     }
 
     public final static Vente getInstance() {
@@ -39,6 +46,10 @@ public class Vente {
 
     public Chronometre getChronometre() {
         return Chronometre;
+    }
+
+    public void subscribe(Subscriber<Notification> subscriber) {
+        this.submissionFlux.subscribe(subscriber);
     }
 
     public void setDureeVente(long Duree) {
@@ -70,8 +81,13 @@ public class Vente {
         }
 
         ListEchere.add(new Enchere(encherisseur, prix));
-
+        this.sendNotification();
         return true;
+    }
+
+    public void tick() {
+        System.out.println("tack");
+        sendNotification();
     }
 
     private float getHighestPrice() {
@@ -85,6 +101,16 @@ public class Vente {
     public void cloture() {
         this.started = false;
         System.out.println("Vente close");
+        this.sendNotification();
+    }
+
+    private void sendNotification() {
+        System.out.println("J'envoie");
+        if (submissionFlux != null) {
+            Enchere LastEnchere = this.ListEchere.get(this.ListEchere.size() - 1);
+            submissionFlux.submit(new Notification(this.Chronometre.getTempsRestant(), LastEnchere.getPrix(),
+                    LastEnchere.getOwner().getPseudo()));
+        }
     }
 
 }

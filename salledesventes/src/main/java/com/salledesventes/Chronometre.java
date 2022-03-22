@@ -32,11 +32,13 @@ public class Chronometre extends TimerTask {
 		// Arrêt du chrono lorsque le temps est écoulé
 		long maintenant = Calendar.getInstance().getTimeInMillis();
 		tempsRestant = finChrono - maintenant;
+		Vente vente = Vente.getInstance();
 		if (tempsRestant <= 0) {
 			System.out.println("Temps écoulé");
-			Vente.getInstance().cloture();
+			vente.cloture();
 			this.cancel();
 		} else {
+			vente.tick();
 			// Transformation des millisecondes en string
 			Duration reste = Duration.ofMillis(tempsRestant);
 			tempsRestantString = String.format("%02d:%02d:%02d", reste.toHours(), reste.toMinutesPart(),
@@ -44,6 +46,10 @@ public class Chronometre extends TimerTask {
 			System.out.println(tempsRestantString);
 		}
 
+	}
+
+	public long getTempsRestant() {
+		return tempsRestant;
 	}
 
 }

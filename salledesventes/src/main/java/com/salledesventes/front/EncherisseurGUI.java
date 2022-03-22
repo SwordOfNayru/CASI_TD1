@@ -21,7 +21,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.salledesventes.*;
 
-public class EncherisseurGUI extends JFrame {
+public class EncherisseurGUI extends JFrame implements Subscriber<Notification> {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private Vente vente = null;
@@ -33,6 +33,7 @@ public class EncherisseurGUI extends JFrame {
 	private JTextField txtChrono;
 	private JTextField txtDerniereEnchere;
 	private JButton boutonAcheter;
+	private Subscription abonnement;
 
 	public EncherisseurGUI() {
 		PseudoDialog d = new PseudoDialog(vente);
@@ -45,6 +46,8 @@ public class EncherisseurGUI extends JFrame {
 			encherisseur = new Encherisseur(pseudo);
 			isAdded = vente.addEncherisseur(encherisseur);
 		}
+
+		this.vente.subscribe(this);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(10, 10, 840, 300);
@@ -193,10 +196,37 @@ public class EncherisseurGUI extends JFrame {
 
 	public void Encherir() {
 		float montant = Float.parseFloat(txtMonEnchere.getText());
-		// To be continued
+		this.vente.encherir(encherisseur, montant);
 	}
 
 	public Vente getVente() {
 		return vente;
+	}
+
+	@Override
+	public void onSubscribe(Subscription subscription) {
+		System.out.println("oskour");
+		this.abonnement = subscription;
+		this.abonnement.request(1);
+	}
+
+	@Override
+	public void onNext(Notification item) {
+		System.out.println("Notif!");
+		this.txtChrono.setText(((Long) item.getTimer()).toString());
+		this.txtDerniereEnchere.setText(((Float) item.getLastPrice()).toString());
+		this.txtEncherisseur.setText(item.getLastEncherisseur());
+		this.abonnement.request(1);
+	}
+
+	@Override
+	public void onError(Throwable throwable) {
+		throwable.printStackTrace();
+
+	}
+
+	@Override
+	public void onComplete() {
+
 	}
 }
